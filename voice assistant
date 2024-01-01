@@ -158,8 +158,8 @@ def file_creation_function(path,filetype):
     with open(path,'w') as f:
         get_audio("What do you want me to write there")
         sentence=speech_recognition_function()
-        if 'yes' in sentence:
-            f.write(sentence)
+     
+        f.write(sentence)
         get_audio("do you want me to open the file or not")
         sentence=speech_recognition_function()
         if ('yes'or 'open') in sentence:
