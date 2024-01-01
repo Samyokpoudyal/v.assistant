@@ -1,0 +1,296 @@
+import pyttsx3
+import datetime
+import webbrowser
+import speech_recognition 
+import os
+import requests
+import tkinter as tk
+from PIL import Image
+import threading
+
+
+def GetDate():
+    return int(datetime.datetime.now().hour)
+
+def get_audio(say):
+    engine=pyttsx3.init()
+    engine.say(say)
+    engine.runAndWait()
+
+def initialization():
+    if (GetDate()>=12 and GetDate()<=17  ):
+        get_audio("Good afternoon samyok, how can i help you")
+    
+    elif (GetDate()<=12):
+        get_audio("Good morning samyok,how can i help you")
+
+    elif (GetDate()>=17 and GetDate()<=24):
+        get_audio("Good evening samyok,how can i help you")
+
+def web(link):
+    chrome_path ="C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s"
+    return webbrowser.get(chrome_path).open(link)
+
+def for_MsWord():
+    
+    get_audio('Speak the name of the file to be searched')
+    
+    sentence1=speech_recognition_function()
+    sentence1=str.lower(sentence1)
+    if  ('sorry' or 'return') in sentence1:
+        get_audio("returning")
+        return None
+    else:
+        sentence1=sentence1+'.docx'
+        print(sentence1)
+        searcher(sentence1)
+
+    
+
+
+def for_Note_Pad():
+    get_audio("Speak the name of the file to be searched")
+
+    sentence2=speech_recognition_function()
+    sentence2=str.lower(sentence2)
+    if ('sorry' or 'return')in sentence2:
+        get_audio("returning")
+        return None
+    else:
+        sentence2=sentence2+'.txt'
+        print(sentence2)
+        searcher(sentence2)
+
+    
+    
+def searcher(sentence):
+    path = r"C:\Users"
+    B=False
+    if path == r"C:\Users":
+        for root, dir, files in (os.walk(path)):
+            if sentence in files :
+                B=True
+                sentence=os.path.join(root,sentence)
+                print('Its path is :',sentence)
+                os.startfile(sentence)
+
+        path =r"D:\\"
+        for root, dir, files in (os.walk(path)):
+            if sentence in files :
+                B=True
+                sentence=os.path.join(root,sentence)
+                print('Its path is :',sentence)
+                os.startfile(sentence)
+                
+
+    if B == False:
+        get_audio('File not found')
+        
+            
+
+def for_Music():
+    
+    get_audio('Which music u wanna play')
+    sentence=speech_recognition_function()
+    sentence=str.lower(sentence)
+    if ('sorry' or 'return')in sentence:
+        get_audio("returning")
+    else:
+        sentence=sentence+".mp3"
+        print(sentence)
+        searcher(sentence)
+
+def speech_recognition_function():
+    rec=speech_recognition.Recognizer()
+    with speech_recognition.Microphone() as source:
+        while True:    
+            try:
+                listening=rec.listen(source,timeout=None,phrase_time_limit=None)
+                text=rec.recognize_google(listening)
+                text=str.lower(text)
+                return (text)
+                
+            except:
+                pass
+        
+               
+                
+def weather():
+    r=open(r"C:\Users\acer\Desktop\dart programming\private_api_keys.txt",'r')
+    r=r.readline()
+    w=requests.get(f"http://dataservice.accuweather.com/forecasts/v1/daily/1day/241809?apikey={r}&language=en-us&details=false&metric=false").json()
+    get_audio(w['DailyForecasts'][0]["Temperature"])
+    
+    
+def animation(count):
+        
+        global anim
+        im2 = im[count]
+        
+        gif_label.configure(image=im2)
+        count += 1
+        if count == frames:
+            count =57
+        
+        anim = root.after(50,lambda :animation(count))
+    
+
+
+def speech_recognition_function1():
+    while True:
+        try:
+            rec=speech_recognition.Recognizer()
+            with speech_recognition.Microphone() as source:
+                listening=rec.listen(source,timeout=None,phrase_time_limit=None)
+                text=rec.recognize_google(listening)
+                text=str.lower(text)
+                if ('wake up' or 'max')  in text : 
+                    return (True)  
+        except:
+            pass
+
+
+def file_creation_function(path,filetype):
+    get_audio("what will be its name")
+    sentence=speech_recognition_function()
+    sentence=sentence+filetype
+    path=path+sentence
+    with open(path,'w') as f:
+        get_audio("What do you want me to write there")
+        sentence=speech_recognition_function()
+        if 'yes' in sentence:
+            f.write(sentence)
+        get_audio("do you want me to open the file or not")
+        sentence=speech_recognition_function()
+        if ('yes'or 'open') in sentence:
+            os.startfile(path)
+    
+def docx_funtion(filetype):
+    get_audio("where do you want to create the file ")
+    sentence=speech_recognition_function()
+    if "desktop" in sentence:
+        path=r'C:\Users\acer\Desktop\\'
+        
+        file_creation_function(path,filetype) 
+    elif "documents" in sentence:
+        path=r'C:\Users\acer\Documents\\'
+        file_creation_function(path,filetype) 
+
+def create_new_file():
+    get_audio("Of what type you want me to create a file")
+    sentence=speech_recognition_function()
+    if ('word' or '.docx') in sentence:
+        docx_funtion(filetype='.docx')
+
+    elif ('.pptx' or 'ppt' or 'powerpoint') in sentence:
+        docx_funtion(filetype='.pptx')
+
+    elif ('.txt' or 'notepad') in sentence:
+        docx_funtion(filetype='.txt')
+
+def cretae_new_folder():
+    get_audio("where do you want to create the folder")
+    sentence=speech_recognition_function()
+    
+    try:
+        if 'desktop' in sentence:
+            get_audio("what will be its name")
+            sentence=speech_recognition_function()
+            path=r'C:\Users\acer\Desktop\\'
+            path=path+sentence
+            os.mkdir(path)
+        
+        elif 'documents' in sentence:
+            get_audio("what will be its name")
+            sentence=speech_recognition_function()
+            path=r'C:\Users\acer\Documents\\'
+            path=path+sentence
+            os.mkdir(path)
+
+    except:
+        get_audio('Please try new name or new place ')
+        
+def main_functio_working():
+
+    initialization()
+    get_audio("What do you want me to do")
+    while True:
+        sentence=speech_recognition_function()
+        print(sentence)
+        if 'google' in sentence :
+            print(sentence)
+            get_audio('Opening')
+            web("www.google.com")
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+        elif  'gmail' in sentence:
+            get_audio("opening")
+            web("www.gmail.com")
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+        elif  'ms word' in sentence :
+            for_MsWord()
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+            
+            
+        elif  'music' in sentence :
+            for_Music()
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+            
+            
+        elif  'forecast' in sentence :
+            weather()
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+            
+        elif  'notepad'  in sentence :
+            for_Note_Pad()
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+            
+            
+        elif 'new file' in sentence  :
+            create_new_file()
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+            
+        elif ("quit" or "terminate") in sentence:
+            os._exit(status=0)
+
+        elif 'new folder' in sentence:
+            cretae_new_folder()
+            if (speech_recognition_function1()==True):
+                get_audio('Yes Buddy')
+                continue
+
+        else:
+            get_audio("We donot have that feature sir")
+
+root = tk.Tk()
+root.geometry('250x300')
+root.minsize('250','300')
+root.maxsize('250',300)
+file=r"C:\Users\acer\foit project\jarvis.gif"
+info = Image.open(file)
+frames = info.n_frames  
+im = [tk.PhotoImage(file=file,format=f"gif -index {i}") for i in range(frames)]
+count = 0
+anim = None
+gif_label = tk.Label(root,image=im[count],border=0)
+gif_label.pack()
+t1 = threading.Thread(target=animation, args=[1])
+t1.start()
+t2 = threading.Thread(target=main_functio_working, args=[])
+t2.start()
+root.config(bg='black')
+root.overrideredirect(True)
+root.mainloop()
